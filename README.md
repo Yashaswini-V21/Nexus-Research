@@ -3,7 +3,12 @@
 # 🔬 Nexus Research
 ## *Parallel Multi-Agent AI Research System*
 
-**One query. Four AI agents running in parallel. Real-time web search, structured debate analysis, historical timelines, interactive knowledge graphs, and fact verification — all delivered via live WebSocket streaming.**
+**One query. Four AI agents running in parallel. Real-time web search, etstructured debate analysis, historical timelines, interactive knowledge graphs, and fact verification — all delivered via live WebSocket streaming.**
+
+<br/>
+
+[![GitHub Profile](https://img.shields.io/badge/GitHub-@Yashaswini--V21-181717?style=for-the-badge&logo=github)](https://github.com/Yashaswini-V21)
+[![Repository](https://img.shields.io/badge/Repository-Nexus--Research-0A66C2?style=for-the-badge&logo=github)](https://github.com/Yashaswini-V21/Nexus-Research)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -14,6 +19,12 @@
 [![vis-network](https://img.shields.io/badge/vis--network-Graph_Viz-563D7C?style=for-the-badge&logo=none&logoColor=white)](https://visjs.org)
 [![ReportLab](https://img.shields.io/badge/ReportLab-PDF_Export-CC0000?style=for-the-badge)](https://www.reportlab.com)
 [![MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
+<br/>
+
+### 🔗 Quick Access
+
+[Overview](#-overview) • [Quick Start](#-quick-start) • [Demo Video](#-demo-video) • [Environment Variables](#-environment-variables) • [Troubleshooting](#-troubleshooting) • [API](#-api-reference) • [Roadmap](#-roadmap)
 
 **Why This Matters:** Multi-agent orchestration, semantic memory persistence, real-time streaming, and end-to-end product thinking — all in one portfolio project.
 
@@ -261,6 +272,65 @@ Set `CORS_ORIGINS` as a comma-separated list in `.env` for non-Docker deployment
 CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
+## 🎥 Demo Video
+
+Use this section to share your walkthrough once uploaded:
+
+- **YouTube Demo:** [Add your video link here after upload](https://youtube.com/)
+- **Suggested title:** Nexus Research - Parallel Multi-Agent AI Research Demo
+
+## ⚡ Try In 60 Seconds
+
+1. Start backend with `py -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000`
+2. Open `frontend/index.html`
+3. Run this sample query in the UI:
+
+```text
+Will AGI create more jobs than it replaces by 2035?
+```
+
+Expected result:
+- Debate output with mainstream vs contrarian arguments
+- Timeline with key milestones
+- Interactive knowledge graph
+- Claim verification with confidence and uncertainties
+
+## 🔐 Environment Variables
+
+| Variable | Required | Default | Description |
+|:---------|:---------|:--------|:------------|
+| `GROQ_API_KEY` | Yes | None | API key for Groq LLaMA inference |
+| `TAVILY_API_KEY` | Yes | None | API key for Tavily search retrieval |
+| `CORS_ORIGINS` | No | `http://localhost:3000,http://127.0.0.1:3000` | Comma-separated frontend origins |
+| `RATE_LIMIT_RPM` | No | `15` | Requests per minute per IP |
+| `MODEL_NAME` | No | Project default | Override Groq model selection |
+
+> If you add new env variables in code later, extend this table to keep deployment docs production-ready.
+
+## 🧰 Troubleshooting
+
+| Issue | Likely Cause | Fix |
+|:------|:-------------|:----|
+| API returns auth errors | Missing/invalid `GROQ_API_KEY` or `TAVILY_API_KEY` | Recheck `.env` keys and restart server |
+| Frontend cannot call API | CORS origin mismatch | Add frontend URL to `CORS_ORIGINS` |
+| Docker app not loading on `:3000` | Containers not healthy or still building | Run `docker compose ps` and check logs |
+| Empty/weak results | Search depth too shallow or vague query | Use deeper query depth and more specific prompt |
+| WebSocket updates not appearing | Reverse proxy path or WS route mismatch | Ensure `/ws/*` is proxied to backend in Nginx |
+
+## ❓ FAQ
+
+**Q: Can I swap the LLM model?**  
+Yes. Configure your model setting (for example through `MODEL_NAME`) and restart the backend.
+
+**Q: Is research history stored locally?**  
+Yes. Sessions are persisted in local ChromaDB storage.
+
+**Q: Can I deploy this without Docker?**  
+Yes. Run FastAPI directly and open `frontend/index.html` in the browser.
+
+**Q: Is this production-ready?**  
+It includes core production practices (rate limits, logging, CORS, health checks), and can be extended with auth and observability.
+
 ## 🖥️ Frontend Experience
 
 - Landing page introduces the four-dimension research model
@@ -396,6 +466,18 @@ Nexus-Research/
 - [ ] Scheduled recurring research
 - [ ] Authentication and multi-user support
 - [ ] Benchmark dashboard (latency, token cost, confidence trends)
+
+---
+
+<div align="center">
+
+### Built with curiosity, rigor, and a builder's mindset.
+
+If this project helped you, consider starring the repository and connecting on GitHub.
+
+[GitHub: @Yashaswini-V21](https://github.com/Yashaswini-V21) • [Project Repository](https://github.com/Yashaswini-V21/Nexus-Research)
+
+</div>
 
 
 

@@ -1,3 +1,5 @@
+"""Debate agent — analyzes topics through mainstream and contrarian perspectives."""
+
 import os
 import json
 import asyncio
@@ -10,6 +12,7 @@ logger = logging.getLogger("nexus.agent.debate")
 
 
 class DebateAgent:
+    """Generates structured debate synthesis with consensus vs alternative views."""
     def __init__(self):
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY", ""))
         self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")

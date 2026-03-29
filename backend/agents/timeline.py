@@ -1,3 +1,5 @@
+"""Timeline agent — extracts chronological events and historical context."""
+
 import os
 import json
 import asyncio
@@ -10,6 +12,7 @@ logger = logging.getLogger("nexus.agent.timeline")
 
 
 class TimelineAgent:
+    """Generates 8-12 chronological events with significance ratings and era summary."""
     def __init__(self):
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY", ""))
         self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")

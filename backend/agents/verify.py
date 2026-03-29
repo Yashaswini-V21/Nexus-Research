@@ -1,3 +1,5 @@
+"""Fact verification agent — validates claims with confidence scoring."""
+
 import os
 import json
 import asyncio
@@ -10,6 +12,7 @@ logger = logging.getLogger("nexus.agent.verify")
 
 
 class VerifyAgent:
+    """Generates 6-8 fact-checked claims with per-claim confidence and overall trust score."""
     def __init__(self):
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY", ""))
         self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")

@@ -1,3 +1,5 @@
+"""Knowledge graph agent — constructs semantic node and edge structure."""
+
 import os
 import json
 import asyncio
@@ -10,6 +12,7 @@ logger = logging.getLogger("nexus.agent.mindmap")
 
 
 class MindmapAgent:
+    """Builds 10-14 typed nodes with 12-18 weighted edges for knowledge visualization."""
     def __init__(self):
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY", ""))
         self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")

@@ -1,3 +1,12 @@
+"""Nexus Research API — FastAPI backend with async multi-agent orchestration.
+
+Provides REST and WebSocket endpoints for 4D research:
+  - Debate analysis (mainstream vs contrarian)
+  - Historical timeline extraction
+  - Knowledge graph construction
+  - Fact verification with confidence scoring
+"""
+
 import os
 import asyncio
 import json
@@ -5,7 +14,8 @@ import logging
 import time
 import uuid
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +25,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Logging ──────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -42,11 +51,28 @@ if not TAVILY_KEY:
 
 app = FastAPI(title="Nexus Research API", version="2.0.0")
 
+
+def _parse_cors_origins() -> list[str]:
+    """Parse comma-separated origins from env, with safe local defaults."""
+    configured = os.getenv("CORS_ORIGINS", "").strip()
+    if configured:
+        return [o.strip() for o in configured.split(",") if o.strip()]
+    return [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
+
+
+cors_origins = _parse_cors_origins()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 # ── Rate Limiting (in-memory, per-IP) ────────────────────────────────
@@ -85,7 +111,7 @@ verify_agent = VerifyAgent()
 
 class ResearchRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=500)
-    depth: str = "deep"
+    depth: Literal["basic", "deep"] = "deep"
 
 
 @app.get("/")
@@ -95,6 +121,20 @@ async def root():
         "version": "2.0.0",
         "status": "operational",
         "dimensions": ["debate", "timeline", "knowledge_graph", "fact_check"],
+        "keys_configured": {
+            "groq": bool(GROQ_KEY),
+            "tavily": bool(TAVILY_KEY),
+        },
+    }
+
+
+@app.get("/api/health")
+async def health():
+    return {
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "rate_limit_rpm": RATE_LIMIT,
+        "cors_origins": cors_origins,
         "keys_configured": {
             "groq": bool(GROQ_KEY),
             "tavily": bool(TAVILY_KEY),
@@ -120,8 +160,8 @@ async def run_research(request: ResearchRequest):
             detail="API keys not configured. Set GROQ_API_KEY and TAVILY_API_KEY in .env",
         )
 
-    research_id = str(uuid.uuid4())[:8]
-    timestamp = datetime.utcnow().isoformat()
+    research_id = uuid.uuid4().hex[:12]
+    timestamp = datetime.now(timezone.utc).isoformat()
     logger.info(f"[{research_id}] Research started: {request.query!r} (depth={request.depth})")
 
     # Parallel: web search + related memory context
@@ -169,8 +209,8 @@ async def ws_research(ws: WebSocket):
             await ws.close()
             return
 
-        research_id = str(uuid.uuid4())[:8]
-        timestamp = datetime.utcnow().isoformat()
+        research_id = uuid.uuid4().hex[:12]
+        timestamp = datetime.now(timezone.utc).isoformat()
         logger.info(f"[WS:{research_id}] Streaming research: {query!r}")
 
         # Stage 1: Search
@@ -179,17 +219,22 @@ async def ws_research(ws: WebSocket):
         related = memory.get_related(query, n_results=3)
         await ws.send_json({"type": "stage", "stage": "search", "status": "done", "count": len(search_results)})
 
-        # Stage 2-5: Run agents one-by-one to stream progress (still fast via Groq)
-        agents = [
-            ("debate", debate_agent.run(query, search_results, related)),
-            ("timeline", timeline_agent.run(query, search_results)),
-            ("graph", mindmap_agent.run(query, search_results, related)),
-            ("verify", verify_agent.run(query, search_results)),
+        # Stage 2-5: Run all agents in parallel and stream completion per stage
+        async def _run_named_agent(name: str, coro):
+            return name, await _safe_run(name, coro)
+
+        agent_tasks = [
+            asyncio.create_task(_run_named_agent("debate", debate_agent.run(query, search_results, related))),
+            asyncio.create_task(_run_named_agent("timeline", timeline_agent.run(query, search_results))),
+            asyncio.create_task(_run_named_agent("graph", mindmap_agent.run(query, search_results, related))),
+            asyncio.create_task(_run_named_agent("verify", verify_agent.run(query, search_results))),
         ]
+        for stage in ["debate", "timeline", "graph", "verify"]:
+            await ws.send_json({"type": "stage", "stage": stage, "status": "running"})
+
         agent_results = {}
-        for name, coro in agents:
-            await ws.send_json({"type": "stage", "stage": name, "status": "running"})
-            result = await _safe_run(name, coro)
+        for done_task in asyncio.as_completed(agent_tasks):
+            name, result = await done_task
             agent_results[name] = result
             await ws.send_json({"type": "stage", "stage": name, "status": "done"})
 

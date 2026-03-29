@@ -1,11 +1,14 @@
+"""ChromaDB-based persistent memory for research sessions."""
+
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import chromadb
 
 
 class ResearchMemory:
+    """Vector database for semantic search across past research sessions."""
     def __init__(self):
         db_path = os.path.join(os.path.dirname(__file__), "..", "chroma_db")
         self.client = chromadb.PersistentClient(path=db_path)
@@ -21,7 +24,7 @@ class ResearchMemory:
                 documents=[query],
                 metadatas=[
                     {
-                        "timestamp": data.get("timestamp", datetime.utcnow().isoformat()),
+                        "timestamp": data.get("timestamp", datetime.now(timezone.utc).isoformat()),
                         "query": query,
                         "data": json.dumps(data),
                     }

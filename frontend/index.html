@@ -951,7 +951,7 @@
       <div class="step reveal reveal-d2">
         <div class="step-num">2</div>
         <div class="step-title">Web Search</div>
-        <div class="step-desc">Tavily fetches 8+ real-time sources with advanced retrieval depth.</div>
+        <div class="step-desc">Tavily fetches up to 5 real-time sources with advanced retrieval depth.</div>
       </div>
       <div class="step reveal reveal-d3">
         <div class="step-num">3</div>
@@ -1213,7 +1213,14 @@ function backToLanding(){
 /* ═══════════════════════════════════════════════════════════
    APP STATE
    ═══════════════════════════════════════════════════════════ */
-const API='http://localhost:8000';
+function resolveApiBase(){
+  if(window.NEXUS_API_BASE) return window.NEXUS_API_BASE;
+  if(window.location.protocol === 'http:' || window.location.protocol === 'https:'){
+    return window.location.origin;
+  }
+  return 'http://localhost:8000';
+}
+const API=resolveApiBase();
 let cur=null, depth='basic', net=null, researchStart=0, timerInterval=null;
 
 document.querySelectorAll('.d-btn').forEach(b=>b.addEventListener('click',()=>{
@@ -1408,7 +1415,7 @@ function renderVerify(v){
     <div class="conf-ring"><svg width="72" height="72" viewBox="0 0 72 72"><circle class="ring-bg" cx="36" cy="36" r="${R}" fill="none" stroke-width="5"/><circle class="ring-fill" cx="36" cy="36" r="${R}" fill="none" stroke-width="5" stroke="${color}" stroke-dasharray="${C}" stroke-dashoffset="${C-dash}"/></svg><div class="conf-val"><span class="conf-pct" style="color:${color}">${pct}%</span><span class="conf-lbl">Trust</span></div></div>
     <div class="verify-meta"><h3>Fact Verification Report</h3><p>${esc(v.recommendation||'')}</p></div>`;
   document.getElementById('claimsGrid').innerHTML=(v.claims||[]).map((c,i)=>{
-    const confPct=Math.round((c.confidence||0)*100);
+    const confPct=Math.round(((c.confidence_score ?? c.confidence) || 0)*100);
     const confColor=confPct>=70?'var(--accent)':confPct>=40?'var(--yellow)':'var(--red)';
     return`
     <div class="claim-card" style="animation:fadeUp .35s cubic-bezier(.22,1,.36,1) ${i*.05}s both">
@@ -1535,7 +1542,7 @@ function toggleTheme(){
 /* ═══════════════════════════════════════════════════════════
    WEBSOCKET STREAMING RESEARCH
    ═══════════════════════════════════════════════════════════ */
-let useWS=false; // REST is faster (parallel agents); WS available for streaming
+let useWS=true; // Prefer live stage streaming; REST fallback is automatic on failure
 async function goWS(q){
   return new Promise((resolve,reject)=>{
     const wsUrl=API.replace('http','ws')+'/ws/research';

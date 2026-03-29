@@ -1,7 +1,8 @@
-import os
+"""PDF report generation using ReportLab with styled sections for all 4D research dimensions."""
+
 import tempfile
 
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle

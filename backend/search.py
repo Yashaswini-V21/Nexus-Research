@@ -1,3 +1,5 @@
+"""Tavily Search API wrapper for real-time web retrieval."""
+
 import os
 import asyncio
 import logging
@@ -8,6 +10,7 @@ logger = logging.getLogger("nexus.search")
 
 
 class TavilySearch:
+    """Encapsulates Tavily search client with connection pooling and error handling."""
     def __init__(self):
         self._api_key = os.getenv("TAVILY_API_KEY", "")
         self._client = None

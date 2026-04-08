@@ -9,6 +9,7 @@
 
 [![GitHub Profile](https://img.shields.io/badge/GitHub-@Yashaswini--V21-181717?style=for-the-badge&logo=github)](https://github.com/Yashaswini-V21)
 [![Repository](https://img.shields.io/badge/Repository-Nexus--Research-0A66C2?style=for-the-badge&logo=github)](https://github.com/Yashaswini-V21/Nexus-Research)
+[![YouTube Demo](https://img.shields.io/badge/YouTube-Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/26-yIEpC15g)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -276,8 +277,11 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 Use this section to share your walkthrough once uploaded:
 
-- **YouTube Demo:** [Add your video link here after upload](https://youtube.com/)
+- **Demo URL:** https://youtu.be/26-yIEpC15g
+- **YouTube Demo:** [Watch on YouTube](https://youtu.be/26-yIEpC15g)
 - **Suggested title:** Nexus Research - Parallel Multi-Agent AI Research Demo
+
+[![Watch the Nexus Research Demo](https://img.youtube.com/vi/4VanDCQMFQY/maxresdefault.jpg)](https://youtu.be/26-yIEpC15g)
 
 ## ⚡ Try In 60 Seconds
 
@@ -499,4 +503,5 @@ Contributions, issues, and feature requests are welcome! Feel free to open an is
 <sub>Built with Groq · Tavily · FastAPI · ChromaDB · vis-network · ReportLab · Docker · Tested with pytest</sub>
 
 </div>
+
 
